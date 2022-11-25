@@ -3,6 +3,24 @@
 use super::maze::{ Maze, CellPos };
 use super::direction::Direction;
 
+pub trait MazeCharset {
+    fn corner_char(&self, index: usize) -> char;
+    // fn solution_chars(&self, index: usize) -> String;
+    fn horizontal_line(&self) -> String;
+}
+
+pub struct AsciiCharSet;
+
+impl MazeCharset for AsciiCharSet {
+    fn corner_char(&self, index: usize) -> char {
+        ASCII_CORNER_CHARS[index]
+    }
+
+    fn horizontal_line(&self) -> String {
+        format!("{}{}{}", self.corner_char(10), self.corner_char(10), self.corner_char(10))
+    }
+}
+
 const ASCII_CORNER_CHARS: [char; 16] = [
     ' ',
     '+',
@@ -26,7 +44,7 @@ fn horizontal_line() -> String {
     format!("{}{}{}", ASCII_CORNER_CHARS[10], ASCII_CORNER_CHARS[10], ASCII_CORNER_CHARS[10])
 }
 
-// const asciiSolutionChars = &[
+// const ascii_solution_chars: &[&str] = &[
 //     "   ",
 //     "   ",
 //     "   ",
@@ -44,6 +62,18 @@ fn horizontal_line() -> String {
 //     "   ",
 //     "   "
 // ];
+
+pub struct MazePrinter {
+    char_set: &dyn MazeCharset
+}
+
+impl MazePrinter {
+    pub fn new(char_set: &dyn MazeCharset) -> Self {
+        Self {
+            char_set
+        }
+    }
+}
 
 pub fn print_maze(m: &Maze) {
     for row in 0..m.rows as i32 {
