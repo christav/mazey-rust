@@ -31,16 +31,34 @@ impl CellPos {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+struct CellData {
+    door_mask: u32,
+    mark: u32
+}
+
+impl CellData {
+    pub fn new() -> Self {
+        CellData {
+            door_mask: 0,
+            mark: 0
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Maze {
     pub rows: usize,
     pub columns: usize,
-    pub cells: Vec<u32>
+    cells: Vec<CellData>
 }
 
 impl Maze {
     pub fn new(rows: usize, columns: usize) -> Self {
-        let mut cells = vec![0u32; rows * columns];
+        let mut cells = Vec::with_capacity(rows * columns);
+        for i in 0..rows * columns {
+            cells.push(CellData::new());
+        }
 
         // // Temporary fill to test printing
         // let mut mask = 7;
@@ -48,19 +66,19 @@ impl Maze {
         //     cells[i] = mask;
         //     mask = (mask + 1) % 16;
         // }
-        cells[0] = 15;
-        cells[9 * columns + 9] = 15;
-        cells[9 * columns + 10] = Direction::Left.to_door_mask();
-        cells[10 * columns + 9] = Direction::Up.to_door_mask();
+        cells[0].door_mask = 15;
+        cells[9 * columns + 9].door_mask = 15;
+        cells[9 * columns + 10].door_mask = Direction::Left.to_door_mask();
+        cells[10 * columns + 9].door_mask = Direction::Up.to_door_mask();
         // Top row can't go up
         for i in 0..columns {
-            cells[i] = cells[i] & (!Direction::Up.to_door_mask());
+            cells[i].door_mask &= !Direction::Up.to_door_mask();
         }
 
         // Bottom row can't go down
         let last_row_start = (rows - 1) * columns;
         for i in 0..columns {
-            cells[last_row_start + i] = cells[last_row_start + i] & !Direction::Down.to_door_mask();
+            cells[last_row_start + i].door_mask &= !Direction::Down.to_door_mask();
         }
 
         Maze {
@@ -76,8 +94,8 @@ impl Maze {
         }
 
         let index = pos.to_index(self);
-        let cell_mask = self.cells[index];
-        let direction_mask = direction.to_door_mask() as u32;
+        let cell_mask = self.cells[index].door_mask;
+        let direction_mask = direction.to_door_mask();
         cell_mask & direction_mask != 0
     }
 }
