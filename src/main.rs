@@ -1,17 +1,17 @@
 use std::env;
 mod mazey;
 use mazey::maze::Maze;
-use mazey::printer::{ MazeCharset, AsciiCharSet, UnicodeCharSet, MazePrinter };
+use mazey::printer::{ MazePrinter, MazeCharset, ASCII_CHARSET, UNICODE_CHARSET };
 
 
 fn main() {
-    let char_set: &dyn MazeCharset;
+    let char_set: &MazeCharset;
     let args: Vec<String> = env::args().collect();
 
     char_set = if args.len() < 2 || args[1] == "-u" {
-        &UnicodeCharSet {}
+        &UNICODE_CHARSET
     } else {
-        &AsciiCharSet {}
+        &ASCII_CHARSET
     };
 
     let maze = Maze::new(30, 20);

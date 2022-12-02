@@ -55,7 +55,7 @@ pub struct Maze {
 impl Maze {
     pub fn new(rows: usize, columns: usize) -> Self {
         let mut cells = Vec::with_capacity(rows * columns);
-        for i in 0..rows * columns {
+        for _i in 0..rows * columns {
             cells.push(CellData::new());
         }
 
