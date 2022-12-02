@@ -111,6 +111,41 @@ const ASCII_CORNER_CHARS: [char; 16] = [
 //     "   "
 // ];
 
+fn corner_char_index(maze: &Maze, pos: CellPos) -> usize {
+    let mut index: usize = 0;
+    index |= if maze.can_go(pos.go(&Direction::Up), Direction::Left) { 0 } else { 1 };
+    index |= if maze.can_go(pos, Direction::Up) { 0 } else { 2 };
+    index |= if maze.can_go(pos, Direction::Left) { 0 } else { 4 };
+    index |= if maze.can_go(pos.go(&Direction::Left), Direction::Up) { 0 } else { 8 };
+
+    if pos.row == 0 {
+        index &= 0xe;
+    }
+    if pos.col == 0 {
+        index &= 0x7;
+    }
+    index
+}
+
+fn row_separator_end_char_index(maze: &Maze, row: i32) -> usize {
+    let mut index: usize = 0;
+    let last_cell_pos = CellPos { row, col: (maze.columns as i32) - 1 };
+    index |= if maze.can_go(last_cell_pos, Direction::Up) && maze.can_go(last_cell_pos.go(&Direction::Up), Direction::Right) { 0 } else { 1 };
+    index |= if maze.can_go(last_cell_pos, Direction::Right) { 0 } else { 4 };
+    index |= if maze.can_go(last_cell_pos, Direction::Up) { 0 } else { 8 };
+
+    if row == 0 {
+        index &= 0xe;
+    }
+    index
+}
+
+fn bottom_right_char_index(maze: &Maze) -> usize {
+    let bottom_right_pos = CellPos { row: maze.rows as i32 - 1, col: maze.columns as i32 - 1 };
+    let index = 0x8 | (if maze.can_go(bottom_right_pos, Direction::Right) { 0 } else { 1 });
+    index
+}
+
 pub struct MazePrinter<'a> {
     char_set: &'a dyn MazeCharset
 }
@@ -183,38 +218,13 @@ impl<'a> MazePrinter<'a> {
     }
 
     fn corner_char(&self, maze: &Maze, pos: CellPos) -> char {
-        let mut index: usize = 0;
-        index |= if maze.can_go(pos.go(&Direction::Up), Direction::Left) { 0 } else { 1 };
-        index |= if maze.can_go(pos, Direction::Up) { 0 } else { 2 };
-        index |= if maze.can_go(pos, Direction::Left) { 0 } else { 4 };
-        index |= if maze.can_go(pos.go(&Direction::Left), Direction::Up) { 0 } else { 8 };
-
-        if pos.row == 0 {
-            index &= 0xe;
-        }
-        if pos.col == 0 {
-            index &= 0x7;
-        }
-
-        self.char_set.corner_char(index)
+        self.char_set.corner_char(corner_char_index(maze, pos))
     }
-
     fn row_separator_end_char(&self, maze: &Maze, row: i32) -> char {
-        let mut index: usize = 0;
-        let last_cell_pos = CellPos { row, col: (maze.columns as i32) - 1 };
-        index |= if maze.can_go(last_cell_pos, Direction::Up) && maze.can_go(last_cell_pos.go(&Direction::Up), Direction::Right) { 0 } else { 1 };
-        index |= if maze.can_go(last_cell_pos, Direction::Right) { 0 } else { 4 };
-        index |= if maze.can_go(last_cell_pos, Direction::Up) { 0 } else { 8 };
-
-        if row == 0 {
-            index &= 0xe;
-        }
-        self.char_set.corner_char(index)
+        self.char_set.corner_char(row_separator_end_char_index(maze, row))
     }
 
     fn bottom_right_char(&self, maze: &Maze) -> char {
-        let bottom_right_pos = CellPos { row: maze.rows as i32 - 1, col: maze.columns as i32 - 1 };
-        let index = 0x8 | (if maze.can_go(bottom_right_pos, Direction::Right) { 0 } else { 1 });
-        self.char_set.corner_char(index)
+        self.char_set.corner_char(bottom_right_char_index(maze))
     }
 }
