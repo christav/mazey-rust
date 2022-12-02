@@ -8,7 +8,7 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub fn to_door_mask(&self) -> u8 {
+    pub fn to_door_mask(&self) -> u32 {
         match self {
             Direction::None => 0,
             Direction::Up => 1,

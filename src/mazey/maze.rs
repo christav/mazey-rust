@@ -50,17 +50,17 @@ impl Maze {
         // }
         cells[0] = 15;
         cells[9 * columns + 9] = 15;
-        cells[9 * columns + 10] = Direction::Left.to_door_mask() as u32;
-        cells[10 * columns + 9] = Direction::Up.to_door_mask() as u32;
+        cells[9 * columns + 10] = Direction::Left.to_door_mask();
+        cells[10 * columns + 9] = Direction::Up.to_door_mask();
         // Top row can't go up
         for i in 0..columns {
-            cells[i] = cells[i] & (!Direction::Up.to_door_mask() as u32);
+            cells[i] = cells[i] & (!Direction::Up.to_door_mask());
         }
 
         // Bottom row can't go down
         let last_row_start = (rows - 1) * columns;
         for i in 0..columns {
-            cells[last_row_start + i] = cells[last_row_start + i] & (!Direction::Down.to_door_mask() as u32);
+            cells[last_row_start + i] = cells[last_row_start + i] & !Direction::Down.to_door_mask();
         }
 
         Maze {

@@ -217,7 +217,4 @@ impl<'a> MazePrinter<'a> {
         let index = 0x8 | (if maze.can_go(bottom_right_pos, Direction::Right) { 0 } else { 1 });
         self.char_set.corner_char(index)
     }
-
-
-
 }
