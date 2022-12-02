@@ -27,4 +27,14 @@ impl Direction {
             Direction::Right => (0, 1)
         }
     }
+
+    pub fn to_opposite(&self) -> Self {
+        match self {
+            Direction::None => Direction::None,
+            Direction::Up => Direction::Down,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left
+        }
+    }
 }
