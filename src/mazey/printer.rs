@@ -184,10 +184,10 @@ impl<'a> MazePrinter<'a> {
 
     fn corner_char(&self, maze: &Maze, pos: CellPos) -> char {
         let mut index: usize = 0;
-        index |= if maze.can_go(pos.go(Direction::Up), Direction::Left) { 0 } else { 1 };
+        index |= if maze.can_go(pos.go(&Direction::Up), Direction::Left) { 0 } else { 1 };
         index |= if maze.can_go(pos, Direction::Up) { 0 } else { 2 };
         index |= if maze.can_go(pos, Direction::Left) { 0 } else { 4 };
-        index |= if maze.can_go(pos.go(Direction::Left), Direction::Up) { 0 } else { 8 };
+        index |= if maze.can_go(pos.go(&Direction::Left), Direction::Up) { 0 } else { 8 };
 
         if pos.row == 0 {
             index &= 0xe;
@@ -202,7 +202,7 @@ impl<'a> MazePrinter<'a> {
     fn row_separator_end_char(&self, maze: &Maze, row: i32) -> char {
         let mut index: usize = 0;
         let last_cell_pos = CellPos { row, col: (maze.columns as i32) - 1 };
-        index |= if maze.can_go(last_cell_pos, Direction::Up) && maze.can_go(last_cell_pos.go(Direction::Up), Direction::Right) { 0 } else { 1 };
+        index |= if maze.can_go(last_cell_pos, Direction::Up) && maze.can_go(last_cell_pos.go(&Direction::Up), Direction::Right) { 0 } else { 1 };
         index |= if maze.can_go(last_cell_pos, Direction::Right) { 0 } else { 4 };
         index |= if maze.can_go(last_cell_pos, Direction::Up) { 0 } else { 8 };
 
