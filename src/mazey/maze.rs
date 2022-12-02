@@ -21,12 +21,16 @@ impl CellPos {
         row_in_range && col_in_range
     }
 
-    pub fn go(self, direction: &Direction) -> Self {
+    pub fn go(&self, direction: &Direction) -> Self {
         let (delta_row, delta_col) = direction.to_delta();
         Self {
             row: self.row + delta_row,
             col: self.col + delta_col
         }
+    }
+
+    pub fn is_exit(&self, maze: &Maze) -> bool {
+        self.col == (maze.columns - 1) as i32 && maze.can_go(*self, Direction::Right)
     }
 }
 
@@ -68,8 +72,10 @@ impl Maze {
         let test_cell = CellPos { row: 9, col: 9 };
         m.open_door(test_cell, &Direction::Up);
         m.open_door(test_cell, &Direction::Left);
-
+        m.open_door(test_cell, &Direction::Right);
+        m.open_door(test_cell, &Direction::Down);
         m.open_door(CellPos { row: 0, col: 0}, &Direction::Left);
+        m.open_door(CellPos { row: 1, col: (columns - 1) as i32}, &Direction::Right);
         m
     }
 
