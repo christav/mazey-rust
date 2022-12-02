@@ -15,10 +15,6 @@ impl<'a> MazeCharset<'a> {
         MazeCharset { corner_chars }
     }
 
-    pub fn corner_char_at(&self, index: usize) -> char {
-        self.corner_chars[index]
-    }
-
     pub fn corner_char(&self, maze: &Maze, pos: CellPos) -> char {
         let mut index: usize = 0;
         index |= if maze.can_go(pos.go(&Direction::Up), Direction::Left) { 0 } else { 1 };
@@ -56,19 +52,24 @@ impl<'a> MazeCharset<'a> {
         self.corner_chars[index]
     }
 
-    pub fn bottom_separator_char(&self, maze: &Maze, col: i32) -> char {
+    pub fn bottom_separator(&self, maze: &Maze, col: i32) -> String {
         let pos = CellPos { row: maze.rows as i32 - 1, col };
         let mut index = 0xa | (if maze.can_go(pos, Direction::Left) { 0 } else { 1 });
         if col == 0 {
             index &= 0x7;
         }
 
-        self.corner_chars[index]
+        let bottom_separator_char = self.corner_chars[index];
+        format!("{}{}", bottom_separator_char, self.horizontal_bar())
     }
 
-    pub fn horizontal_line(&self) -> String {
+    pub fn horizontal_bar(&self) -> String {
         let dash = self.corner_chars[10];
         format!("{}{}{}", dash, dash, dash)
+    }
+
+    pub fn vertical_bar(&self) -> char {
+        self.corner_chars[5]
     }
 }
 
@@ -183,7 +184,7 @@ impl<'a> MazePrinter<'a> {
             if maze.can_go(pos, Direction::Up) {
                 print!("   ");
             } else {
-                print!("{}", self.char_set.horizontal_line());
+                print!("{}", self.char_set.horizontal_bar());
             }
         }
 
@@ -197,12 +198,12 @@ impl<'a> MazePrinter<'a> {
             if maze.can_go(pos, Direction::Left) {
                 print!(" ");
             } else {
-                print!("{}", self.char_set.corner_char_at(5));
+                print!("{}", self.char_set.vertical_bar());
             }
             print!("{}", self.cell_contents(maze, pos));
         }
 
-        print!("{}", self.char_set.corner_char_at(5));
+        print!("{}", self.char_set.vertical_bar());
         println!();
     }
 
@@ -212,14 +213,9 @@ impl<'a> MazePrinter<'a> {
 
     fn print_maze_bottom(&self, maze: &Maze) {
         for col in 0..maze.columns as i32 {
-            self.print_bottom_separator(maze, col);
+            print!("{}", self.char_set.bottom_separator(maze, col));
         }
         print!("{}", self.char_set.bottom_right_char(maze));
         println!();
-    }
-
-    fn print_bottom_separator(&self, maze: &Maze, col: i32) {
-        print!("{}", self.char_set.bottom_separator_char(maze, col));
-        print!("{}", self.char_set.horizontal_line());
     }
 }
