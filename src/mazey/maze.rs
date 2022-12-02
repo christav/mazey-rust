@@ -23,10 +23,10 @@ impl CellPos {
     }
 
     pub fn go(self, direction: Direction) -> Self {
-        let (new_row, new_col) = direction.to_delta();
+        let (delta_row, delta_col) = direction.to_delta();
         Self {
-            row: new_row,
-            col: new_col
+            row: self.row + delta_row,
+            col: self.col + delta_col
         }
     }
 }
@@ -42,13 +42,16 @@ impl Maze {
     pub fn new(rows: usize, columns: usize) -> Self {
         let mut cells = vec![0u32; rows * columns];
 
-        // Temporary fill to test printing
-        let mut mask = 7;
-        for i in 0..rows * columns {
-            cells[i] = mask;
-            mask = (mask + 1) % 16;
-        }
-
+        // // Temporary fill to test printing
+        // let mut mask = 7;
+        // for i in 0..rows * columns {
+        //     cells[i] = mask;
+        //     mask = (mask + 1) % 16;
+        // }
+        cells[0] = 15;
+        cells[9 * columns + 9] = 15;
+        cells[9 * columns + 10] = Direction::Left.to_door_mask() as u32;
+        cells[10 * columns + 9] = Direction::Up.to_door_mask() as u32;
         // Top row can't go up
         for i in 0..columns {
             cells[i] = cells[i] & (!Direction::Up.to_door_mask() as u32);

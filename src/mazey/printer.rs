@@ -9,6 +9,19 @@ pub trait MazeCharset {
     fn horizontal_line(&self) -> String;
 }
 
+pub struct UnicodeCharSet;
+
+impl MazeCharset for UnicodeCharSet {
+    fn corner_char(&self, index: usize) -> char {
+        UNICODE_CORNER_CHARS[index]
+    }
+
+    fn horizontal_line(&self) -> String {
+        let dash = self.corner_char(10);
+        format!("{}{}{}", dash, dash, dash)
+    }
+}
+
 pub struct AsciiCharSet;
 
 impl MazeCharset for AsciiCharSet {
@@ -17,9 +30,48 @@ impl MazeCharset for AsciiCharSet {
     }
 
     fn horizontal_line(&self) -> String {
-        format!("{}{}{}", self.corner_char(10), self.corner_char(10), self.corner_char(10))
+        let dash = self.corner_char(10);
+        format!("{}{}{}", dash, dash, dash)
     }
 }
+
+const UNICODE_CORNER_CHARS: [char; 16] = [
+    ' ',
+    '╹',
+    '╺',
+    '┗',
+    '╻',
+    '┃',
+    '┏',
+    '┣',
+    '╸',
+    '┛',
+    '━',
+    '┻',
+    '┓',
+    '┫',
+    '┳',
+    '╋'
+];
+
+// const UNICODE_SOLUTION_CHARS: &[&str] = &[
+//     "   ",
+//     "   ",
+//     "   ",
+//     " ╰┄",
+//     "   ",
+//     " ┆ ",
+//     " ╭┄",
+//     "   ",
+//     "   ",
+//     "┄╯ ",
+//     "┄┄┄",
+//     "   ",
+//     "┄╮ ",
+//     "   ",
+//     "   ",
+//     "   "
+// ];
 
 const ASCII_CORNER_CHARS: [char; 16] = [
     ' ',
@@ -40,11 +92,7 @@ const ASCII_CORNER_CHARS: [char; 16] = [
     '+'
 ];
 
-fn horizontal_line() -> String {
-    format!("{}{}{}", ASCII_CORNER_CHARS[10], ASCII_CORNER_CHARS[10], ASCII_CORNER_CHARS[10])
-}
-
-// const ascii_solution_chars: &[&str] = &[
+// const ASCII_SOLUTION_CHARS: &[&str] = &[
 //     "   ",
 //     "   ",
 //     "   ",
@@ -136,10 +184,10 @@ impl<'a> MazePrinter<'a> {
 
     fn corner_char(&self, maze: &Maze, pos: CellPos) -> char {
         let mut index: usize = 0;
-        index |= if maze.can_go(pos, Direction::Up) && maze.can_go(pos.go(Direction::Up), Direction::Left) { 0 } else { 1 };
+        index |= if maze.can_go(pos.go(Direction::Up), Direction::Left) { 0 } else { 1 };
         index |= if maze.can_go(pos, Direction::Up) { 0 } else { 2 };
         index |= if maze.can_go(pos, Direction::Left) { 0 } else { 4 };
-        index |= if maze.can_go(pos, Direction::Left) && maze.can_go(pos.go(Direction::Left), Direction::Up) { 0 } else { 8 };
+        index |= if maze.can_go(pos.go(Direction::Left), Direction::Up) { 0 } else { 8 };
 
         if pos.row == 0 {
             index &= 0xe;
