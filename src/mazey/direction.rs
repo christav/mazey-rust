@@ -7,6 +7,8 @@ pub enum Direction {
     Left,
 }
 
+pub const ALL_DIRECTIONS: [&Direction; 4] = [ &Direction::Up, &Direction::Right, &Direction::Down, &Direction::Left ];
+
 impl Direction {
     pub fn to_door_mask(&self) -> u32 {
         match self {

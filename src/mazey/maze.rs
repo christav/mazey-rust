@@ -32,12 +32,28 @@ impl CellPos {
     pub fn is_exit(&self, maze: &Maze) -> bool {
         self.col == (maze.columns - 1) as i32 && maze.can_go(*self, Direction::Right)
     }
+
+    pub fn open_door(&self, maze: &mut Maze, direction: &Direction) {
+        maze.open_door(*self, direction);
+    }
+
+    pub fn close_door(&self, maze: &mut Maze, direction: &Direction) {
+        maze.close_door(*self, direction);
+    }
+
+    pub fn set_mark(&self, maze: &mut Maze, mark: i32) {
+        maze.set_mark(*self, mark);
+    }
+
+    pub fn get_mark(&self, maze: &Maze) -> i32 {
+        maze.get_mark(*self)
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
 struct CellData {
     door_mask: u32,
-    mark: u32
+    mark: i32
 }
 
 impl CellData {
@@ -97,9 +113,36 @@ impl Maze {
         }
     }
 
+    fn close_door_at(&mut self, pos: CellPos, direction: &Direction) {
+        if pos.is_in_maze(self) {
+            let index = pos.to_index(self);
+            self.cells[index].door_mask &= !direction.to_door_mask();
+        }
+    }
+
     pub fn open_door(&mut self, pos: CellPos, direction: &Direction) {
         self.open_door_at(pos, direction);
         self.open_door_at(pos.go(direction), direction.to_opposite());
     }
 
+    pub fn close_door(&mut self, pos: CellPos, direction: &Direction) {
+        self.close_door_at(pos, direction);
+        self.close_door_at(pos.go(direction), direction.to_opposite());
+    }
+
+    pub fn set_mark(&mut self, pos: CellPos, mark: i32) {
+        if pos.is_in_maze(self) {
+            let index = pos.to_index(self);
+            self.cells[index].mark = mark;
+        }
+    }
+
+    pub fn get_mark(&self, pos: CellPos) -> i32 {
+        if pos.is_in_maze(self) {
+            let index = pos.to_index(self);
+            self.cells[index].mark
+        } else {
+            -1
+        }
+    }
 }
